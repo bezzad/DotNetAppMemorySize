@@ -1,51 +1,88 @@
-﻿// See https://aka.ms/new-console-template for more information
-using TestZombieThread;
+﻿namespace TestZombieThread;
 
-var threads = 10_000;
-var threadProducer = new ThreadProducer();
-Test.Run();
-
-Console.WriteLine($"\nCreating {threads} zombie threads...\n");
-for (int i = 0; i < threads; i++)
+public class Progrm
 {
-    threadProducer.CreateThread();
+    static int threads = 1_000;
+    static ThreadProducer threadProducer = new ThreadProducer();
+    static Dictionary<int, long> array = new Dictionary<int, long>();
+
+    public static async Task Main()
+    {
+        Test.Run();
+        CreatingZombieThreads();
+        ReleaseZombieThreads();
+        AddingTestData();
+        OpenCloseThreads();
+        await OpenCloseTasks().ConfigureAwait(false);
+
+        Console.WriteLine("============ END ===========");
+        Console.ReadLine();
+    }
+
+    public static void CreatingZombieThreads()
+    {
+        Console.Write($"\nCreating {threads} zombie threads");
+        for (int i = 0; i < threads; i++)
+        {
+            threadProducer.CreateThread();
+            Counting(i);
+        }
+
+        Test.Run();
+    }
+
+    public static void ReleaseZombieThreads()
+    {
+        Console.Write("\n\nRelease zombie threads...  \n");
+        ThreadProducer.CanContinue = true;
+
+        Test.Run();
+    }
+
+    public static void AddingTestData()
+    {
+        Console.Write("\n\nAdding test data");
+        for (int i = 0; i < 20_000_000; i++)
+        {
+            array[i] = i;
+            Counting(i, 100_000);
+        }
+        Console.WriteLine($"\n{array.Count()} items added.\n");
+
+        Test.Run();
+    }
+
+    public static void OpenCloseThreads()
+    {
+        Console.Write($"\nOpen and close new {threads} threads");
+        for (int i = 0; i < threads; i++)
+        {
+            threadProducer.CreateThread();
+            Counting(i);
+        }
+
+        GC.Collect();
+        Test.Run();
+    }
+
+    public static async Task OpenCloseTasks()
+    {
+        Console.Write($"\nCreating {threads} tasks");
+        var tasks = new List<Task>();
+        for (int i = 0; i < threads; i++)
+        {
+            tasks.Add(threadProducer.CreateTask());
+            Counting(i);
+        }
+
+        await Task.WhenAll(tasks).ConfigureAwait(false);
+        GC.Collect();
+        Test.Run();
+    }
+
+    private static void Counting(int i, int per = 100)
+    {
+        if (i % per == 0)
+            Console.Write(".");
+    }
 }
-
-Test.Run();
-
-Console.Write("\n\nRelease zombie threads...  \n");
-ThreadProducer.CanContinue = true;
-
-Test.Run();
-
-Console.Write("\n\nAdding test data...  ");
-var array = new Dictionary<int, long>(1000);
-for (int i = 0; i < 20_000_000; i++)
-{
-    array[i] = i;
-}
-Console.WriteLine($"\t {array.Count()} added.\n");
-
-Test.Run();
-
-
-Console.WriteLine($"\nOpen and close new {threads} threads...\n");
-for (int i = 0; i < threads; i++)
-{
-    threadProducer.CreateThread();
-}
-
-GC.Collect();
-Test.Run();
-
-Console.WriteLine($"\nCreating {threads} tasks...\n");
-for (int i = 0; i < threads; i++)
-{
-    threadProducer.CreateTask();
-}
-
-GC.Collect();
-Test.Run();
-
-Console.WriteLine("============ END ===========");
-Console.ReadLine();

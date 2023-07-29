@@ -1,24 +1,26 @@
-﻿namespace TestZombieThread
+﻿using System.Collections.Concurrent;
+
+namespace TestZombieThread
 {
     public class ThreadProducer
     {
         public static volatile bool CanContinue = false;
-        public static volatile Dictionary<long, Thread> Threads = new Dictionary<long, Thread>();
+        public static volatile ConcurrentDictionary<long, Thread> Threads = new ConcurrentDictionary<long, Thread>();
 
         public void CreateThread()
         {
             var thread = new Thread(Job);
-            Threads[thread.ManagedThreadId] = thread;
+            Threads.TryAdd(thread.ManagedThreadId, thread);
             thread.Start();
         }
 
-        public void CreateTask()
+        public Task CreateTask()
         {
-            var task = new Task(async ()=>
+            return Task.Run(async ()=>
             {
                 await Task.Delay(100);
+                await Task.Yield();
             });
-            task.Start();
         }
 
         private void Job()
@@ -39,7 +41,7 @@
 
             Monitor.Exit(this);
 
-            Threads.Remove(Thread.CurrentThread.ManagedThreadId);
+            Threads.TryRemove(Thread.CurrentThread.ManagedThreadId, out var _);
         }
     }
 }

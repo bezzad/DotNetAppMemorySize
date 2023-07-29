@@ -10,7 +10,7 @@ namespace TestZombieThread
             using Process currentProcess = Process.GetCurrentProcess();
             var memCalc = new MemoryCalc();
 
-            Console.WriteLine("------------ Info ------------");
+            Console.WriteLine("\n------------ Info ------------");
             Console.WriteLine($"Process {currentProcess.ProcessName} - #{currentProcess.Id} - " +
     $"Threads {currentProcess.Threads.Count} | Runtime Threads {memCalc.GetRuntimeAppThreads()}");
 
