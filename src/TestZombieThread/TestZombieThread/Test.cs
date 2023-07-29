@@ -84,7 +84,7 @@ namespace TestZombieThread
             ThreadPool.GetAvailableThreads(out var workerThreads, out var completionPortThreads);
 
             Console.WriteLine("\n------------ Info ------------");
-            Console.WriteLine($"Process {currentProcess.ProcessName} - #{currentProcess.Id} - Threads {currentProcess.Threads.Count} | Runtime Threads {memCalc.GetRuntimeAppThreads()}");
+            Console.WriteLine($"Process {currentProcess.ProcessName} #{currentProcess.Id} --> ManagedThread #{Thread.CurrentThread.ManagedThreadId} - Threads {currentProcess.Threads.Count} | Runtime Threads {memCalc.GetRuntimeAppThreads()}");
             Console.WriteLine($"ThreadPool threads of current {ThreadPool.ThreadCount} | workers {workerThreads} | " +
                 $"completed {ThreadPool.CompletedWorkItemCount} | pending {ThreadPool.PendingWorkItemCount}");
 
