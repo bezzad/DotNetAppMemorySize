@@ -18,7 +18,7 @@ namespace TestZombieThread
         {
             return Task.Run(async ()=>
             {
-                await Task.Delay(100);
+                await Task.Delay(100).ConfigureAwait(false);
                 await Task.Yield();
             });
         }
