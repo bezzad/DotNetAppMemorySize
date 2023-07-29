@@ -61,9 +61,10 @@ namespace TestZombieThread
             for (int i = 0; i < tasksCount; i++)
             {
                 tasks.Add(threadProducer.CreateTask());
-                Counting(i);
+                Counting(i, 1000);
             }
 
+            Run();
             await Task.WhenAll(tasks).ConfigureAwait(false);
             GC.Collect();
             Run();
@@ -80,10 +81,12 @@ namespace TestZombieThread
             Thread.Sleep(1000);
             using Process currentProcess = Process.GetCurrentProcess();
             var memCalc = new MemoryCalc();
+            ThreadPool.GetAvailableThreads(out var workerThreads, out var completionPortThreads);
 
             Console.WriteLine("\n------------ Info ------------");
-            Console.WriteLine($"Process {currentProcess.ProcessName} - #{currentProcess.Id} - " +
-    $"Threads {currentProcess.Threads.Count} | Runtime Threads {memCalc.GetRuntimeAppThreads()}");
+            Console.WriteLine($"Process {currentProcess.ProcessName} - #{currentProcess.Id} - Threads {currentProcess.Threads.Count} | Runtime Threads {memCalc.GetRuntimeAppThreads()}");
+            Console.WriteLine($"ThreadPool threads of current {ThreadPool.ThreadCount} | workers {workerThreads} | " +
+                $"completed {ThreadPool.CompletedWorkItemCount} | pending {ThreadPool.PendingWorkItemCount}");
 
             memCalc.GetTotalAllocatedBytes();
             memCalc.GetTotalMemory();

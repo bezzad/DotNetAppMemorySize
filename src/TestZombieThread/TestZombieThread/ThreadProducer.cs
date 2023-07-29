@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Threading;
 
 namespace TestZombieThread
 {
@@ -6,7 +7,8 @@ namespace TestZombieThread
     {
         public static volatile bool CanContinue = false;
         public static volatile ConcurrentDictionary<long, Thread> Threads = new ConcurrentDictionary<long, Thread>();
-
+        static SemaphoreSlim semaphore = new SemaphoreSlim(1000, 1000);
+        
         public void CreateThread()
         {
             var thread = new Thread(Job);
@@ -16,10 +18,17 @@ namespace TestZombieThread
 
         public Task CreateTask()
         {
-            return Task.Run(async ()=>
+            return Task.Run(async () =>
             {
-                await Task.Delay(100).ConfigureAwait(false);
-                await Task.Yield();
+                try
+                {
+                    await semaphore.WaitAsync().ConfigureAwait(false);
+                    await Task.Delay(100).ConfigureAwait(false);
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
             });
         }
 
