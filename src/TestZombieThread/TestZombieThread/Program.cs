@@ -15,11 +15,10 @@ public class Progrm
             await Test.AddingTestData().ConfigureAwait(false);
             await Test.OpenCloseThreads().ConfigureAwait(false);
             await Test.OpenCloseTasks().ConfigureAwait(false);
-
-            await Console.Out.WriteLineAsync("Do you want to repeat the tests? (y/n)").ConfigureAwait(false);
-            if (Console.ReadKey().KeyChar is 'y' or 'Y')
+            await Test.Run().ConfigureAwait(false); // 1
+            await Console.Out.WriteLineAsync("Do you want to repeat the tests? (y/n)").ConfigureAwait(false); // 2
+            if (Console.ReadKey().KeyChar is 'y' or 'Y') // true: 1   |  false: 2
                 continue;
-
             break;
         }
 

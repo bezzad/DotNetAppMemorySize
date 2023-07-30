@@ -26,7 +26,8 @@ namespace TestZombieThread
         {
             await Console.Out.WriteAsync("\n\nRelease zombie threads...  \n");
             ThreadProducer.CanContinue = true;
-
+            await Task.Delay(1000);
+            GC.Collect();
             await Run().ConfigureAwait(false);
         }
 
@@ -66,7 +67,11 @@ namespace TestZombieThread
             }
 
             await Run().ConfigureAwait(false);
-            await Task.WhenAll(tasks).ConfigureAwait(false);
+            
+            //await Parallel.ForEachAsync(tasks.ToArray()); // open thread (speed up) 1000 count | 10,000
+            //await Task.WhenAll(tasks).ConfigureAwait(false); // threadpool (scalbility up) sharing
+            // ThreadPool.QueueUserWorkItem
+
             GC.Collect();
             await Run().ConfigureAwait(false);
         }
