@@ -67,10 +67,9 @@ namespace TestZombieThread
             }
 
             await Run().ConfigureAwait(false);
-            
-            //await Parallel.ForEachAsync(tasks.ToArray()); // open thread (speed up) 1000 count | 10,000
-            //await Task.WhenAll(tasks).ConfigureAwait(false); // threadpool (scalbility up) sharing
-            // ThreadPool.QueueUserWorkItem
+
+            // await Parallel.ForEachAsync(tasks.ToArray()); // open thread (speed up) 1000 count | 10,000            
+            await Task.WhenAll(tasks).ConfigureAwait(false); // thread pool (scalability up) sharing resources - ThreadPool.QueueUserWorkItem
 
             GC.Collect();
             await Run().ConfigureAwait(false);
